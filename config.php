@@ -7,21 +7,22 @@ return [
         return str_contains($page->getPath(), $section) ? 'selected' : '';
     },
     'collections' => [
-        'posts',
-        'reddit' => [
-            'extends' => '_layouts.reddit',
+        'posts' => [
+            'extends' => '_layouts.posts',
             'items' => function () {
-                $posts = json_decode(file_get_contents('https://www.reddit.com/r/aww.json?raw_json=1'));
-
-                return collect($posts->data->children)->map(function ($post) {
+                $posts = json_decode(file_get_contents('http://n-blog.local/api/posts'));
+                return collect($posts->data)->map(function ($post) {
                     return [
-                        'id' => $post->data->id,
-                        'title' => $post->data->title,
-                        'thumbnail' => $post->data->thumbnail,
-                        'content' => "![alt text](".$post->data->preview->images[0]->source->url.")"
+                        'id' => $post->id,
+                        'title' => $post->title,
+                        'slug' => $post->slug,
+                        'content' => $post->body,
+                        'tags' => $post->tags,
+                        'meta' => $post->meta
                     ];
                 });
             },
+            'path' => 'blog/{slug}'
         ],
     ],
 ];
